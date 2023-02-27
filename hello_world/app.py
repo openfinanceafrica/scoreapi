@@ -14,7 +14,7 @@ def lambda_handler(event, context):
         Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
 
     context: object, required
-        Lambda Context runtime methods and attributes
+        Lambda Context runtime methods & attributes
 
         Context doc: https://docs.aws.amazon.com/lambda/latest/dg/python-context-object.html
 
