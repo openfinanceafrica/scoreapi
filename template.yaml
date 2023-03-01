@@ -53,7 +53,7 @@ Outputs:
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
   ScoreApi:
     Description: API Gateway endpoint URL for Prod stage for Score API function
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/score/"
   ScoreApiFunction:
     Description: Score API Lambda Function ARN
     Value: !GetAtt ScoreApiFunction.Arn
