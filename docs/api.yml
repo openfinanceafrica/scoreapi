@@ -1,7 +1,7 @@
 openapi: "3.0.1"
 info:
   title: "Open Finance Africa / Score API"
-  description: "Generate Payment Scores for your users based on payment schedule terms and payment history"
+  description: "Generate Payment Scores for your users based on scheduled terms and payment history"
   version: "1.0.0"
 servers:
 - url: "https://api.openfinance.africa"
