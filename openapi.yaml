@@ -1,0 +1,153 @@
+openapi: "3.0.1"
+info:
+  title: "Open Finance Africa / Score API"
+  description: "Generate Payment Scores for your users based on payment agreement terms and payment history"
+  version: "1.0.0"
+servers:
+- url: "https://api.openfinance.africa/score"
+paths:
+  /score:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScoreInput"
+        required: true
+      responses:
+        "400":
+          description: "400 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "200":
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Score"
+components:
+  schemas:
+    Score:
+      type: "object"
+      properties:
+        overallScore:
+          type: "number"
+          description: "The overall Payment Score. The range is between 0 and 1 (with\
+            \ 1 being an excellent score)"
+        paidStreak:
+          type: "integer"
+          description: "This number represents the longest continous on-time (fully\
+            \ paid) number of payments. E.g. if on-time payments were made 5 months\
+            \ in a row, this number will be 5"
+          format: "int32"
+        overDueStreak:
+          type: "integer"
+          description: "This number represents the longest continous overdue number\
+            \ of payments. E.g. if payments were overdue for 2 months in a row, this\
+            \ number will be 2"
+          format: "int32"
+        scoredMonths:
+          type: "array"
+          description: "An array of scored months"
+          items:
+            $ref: "#/components/schemas/ScoredMonth"
+        amount:
+          minimum: 1
+          type: "integer"
+          description: "The payment amount expected"
+          format: "int32"
+      description: "The Payment Score which includes an overall score and scored months\
+        \ that correspond to the input that was provided."
+    Payment:
+      type: "object"
+      properties:
+        amount:
+          minimum: 1
+          type: "number"
+          description: "The amount that was paid."
+        date:
+          type: "string"
+          description: "The date that the payment was made. The format should be date-time\
+            \ as defined by \"RFC 3339, section 5.6\" (https://tools.ietf.org/html/rfc3339#section-5.6)"
+          format: "date-time"
+      description: "Defines a payment made with a date and amount"
+    ScoredMonth:
+      type: "object"
+      properties:
+        status:
+          $ref: "#/components/schemas/PaymentStatus"
+        score:
+          type: "number"
+          description: "The Payment Score of the month."
+        dueDate:
+          type: "string"
+          description: "The day of the month that a payment is supposed to be made.\
+            \ The format is a full-date as defined by \"RFC 3339, section 5.6\" (https://tools.ietf.org/html/rfc3339#section-5.6).\
+            \ While the format used is a full date (with time included), only the\
+            \ day, month, and year are relevant. E.g. if payment was due on March\
+            \ 1st 2023, the time that the payment is expected is within that day."
+          format: "date-time"
+        balance:
+          type: "number"
+          description: "The payment balance of the month. This can be positive if\
+            \ there was overpayment or negative if arrears exist."
+      description: "A scored month that is combined with others to provide an overall\
+        \ score. It corresponds to an expected payment date that was provided in the\
+        \ input."
+    Error:
+      required:
+      - "code"
+      - "message"
+      type: "object"
+      properties:
+        code:
+          type: "string"
+        message:
+          type: "string"
+    ScoreInput:
+      type: "object"
+      properties:
+        startDate:
+          type: "string"
+          description: "The date that the payments are supposted to start. The format\
+            \ should be full-date as defined by \"RFC 3339, section 5.6\" (https://tools.ietf.org/html/rfc3339#section-5.6).\
+            \ While the format used is a full date (with time included), only the\
+            \ day, month, and year are relevant. E.g. if the start date is January\
+            \ 1st 2023, payments are expected to start anytime within that day."
+          format: "date-time"
+        endDate:
+          type: "string"
+          description: "The date that the payments are supposted to end. The format\
+            \ should be full-date as defined by \"RFC 3339, section 5.6\" (https://tools.ietf.org/html/rfc3339#section-5.6).\
+            \ While the format used is a full date (with time included), only the\
+            \ day, month, and year are relevant. E.g. if the end date is December\
+            \ 1st 2024, payments are expected to end within that day."
+          format: "date-time"
+        expectedPaymentDay:
+          maximum: 31
+          minimum: 1
+          type: "integer"
+          description: "The expected day of the month that the payments are supposed\
+            \ to be made. E.g. \"1\" if the payments are supposed to be made every\
+            \ 1st of the month"
+          format: "int32"
+        expectedPaymentAmount:
+          minimum: 1
+          type: "integer"
+          description: "The payment amount expected"
+          format: "int32"
+        payments:
+          type: "array"
+          description: "An array of payments that have been made"
+          items:
+            $ref: "#/components/schemas/Payment"
+      description: "Input required to get a score. It includes the terms of payment\
+        \ (e.g. lease details) and the payments that have been made"
+    PaymentStatus:
+      type: "string"
+      enum:
+      - "PAID"
+      - "OVERPAID"
+      - "OVERDUE"
