@@ -32,12 +32,12 @@ class ScoreInput(TypedDict):
     expectedPaymentAmount: int
     payments: List[Payment]
     reference: Optional[str]
-    scoreBeforeLeaseStart: Optional[bool]
+    scoreBeforeStartDate: Optional[bool]
     currentDate: Optional[str]
 
 
 class ScoreError(Enum):
-    LEASE_NOT_STARTED = 'LEASE_NOT_STARTED'
+    START_DATE_IN_FUTURE = 'START_DATE_IN_FUTURE'
     NO_SCORED_MONTHS = 'NO_SCORED_MONTHS'
 
 

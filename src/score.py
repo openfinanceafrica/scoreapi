@@ -1,62 +1,13 @@
-import json
 from typing import List
-from datetime import timedelta, datetime
-
-from common.score import PaymentStatus, Score, ScoreError, ScoreInput, ScoredMonth
-
-
-def lambda_handler(event, context):
-    """Sample pure Lambda function
-
-    Parameters
-    ----------
-    event: dict, required
-        API Gateway Lambda Proxy Input Format
-
-        Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
-
-    context: object, required
-        Lambda Context runtime methods & attributes
-
-        Context doc: https://docs.aws.amazon.com/lambda/latest/dg/python-context-object.html
-
-    Returns
-    ------
-    API Gateway Lambda Proxy Output Format: dict
-
-        Return doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
-    """
-
-    # try:
-    #     ip = requests.get("http://checkip.amazonaws.com/")
-    # except requests.RequestException as e:
-    #     # Send some context about this error to Lambda Logs
-    #     print(e)
-
-    #     raise e
-
-    validateInput(event)
-    scoreInput = getScoreInputFromEvent(event)
-    score = getScore(scoreInput)
-    return {
-        "statusCode": 200,
-        "body": json.dumps(score),
-    }
-
-
-def validateInput(event):
-    print('event:', event)
-    return ''
-
-
-def getScoreInputFromEvent(event):
-    return ''
+from datetime import timedelta, datetime, timezone
+from score_types import PaymentStatus, Score, ScoreError, ScoreInput, ScoredMonth
+from dateutil import parser
 
 
 def getScore(scoreInput: ScoreInput) -> Score:
-    paymentStartDate = datetime.fromisoformat(scoreInput['paymentStartDate'])
+    paymentStartDate = parser.isoparse(scoreInput['paymentStartDate'])
     start = paymentStartDate
-    paymentEndDate = datetime.fromisoformat(scoreInput['paymentEndDate'])
+    paymentEndDate = parser.isoparse(scoreInput['paymentEndDate'])
     expectedPaymentDay = scoreInput['expectedPaymentDay']
     expectedPaymentAmount = scoreInput['expectedPaymentAmount']
     totalScore = 0
@@ -68,11 +19,24 @@ def getScore(scoreInput: ScoreInput) -> Score:
     overDueStreak = 0
     longestOverDueStreak = 0
     balance = 0
-    currentDate = datetime.fromisoformat(scoreInput['currentDate']) if scoreInput.get(
-        'currentDate') else datetime.utcnow()
+    currentDate = parser.isoparse(scoreInput['currentDate']) if scoreInput.get(
+        'currentDate') else datetime.now(timezone.utc)
 
-    # Nothing to show yet if the lease hasn't started yet
-    if datetime.utcnow() < paymentStartDate and not scoreInput.get('scoreBeforeLeaseStart'):
+    # We need to ensure that we are consistently using timezone aware dates so we don't get the error:
+    # "can't compare offset-naive and offset-aware datetimes"
+    # If timezone info isn't included in a date within the request the it's assumed to be UTC.
+    if paymentStartDate.tzinfo is None or paymentStartDate.tzinfo.utcoffset(paymentStartDate) is None:
+        paymentStartDate = paymentStartDate.astimezone()
+        start = paymentStartDate
+    if paymentEndDate.tzinfo is None or paymentEndDate.tzinfo.utcoffset(paymentEndDate) is None:
+        paymentEndDate = paymentEndDate.astimezone()
+    if currentDate.tzinfo is None or currentDate.tzinfo.utcoffset(currentDate) is None:
+        currentDate = currentDate.astimezone()
+
+    # If paymentStartDate is still in the future and scoreBeforeStartDate isn't specified in the request,
+    # we'll exit immediately. It's not necessarily an error but we want users to explicitly say whether
+    # they want to score future dates.
+    if datetime.now(timezone.utc) < paymentStartDate and not scoreInput.get('scoreBeforeStartDate'):
         return {
             'overallScore': overallScore,
             'paidStreak': 0,
@@ -80,7 +44,7 @@ def getScore(scoreInput: ScoreInput) -> Score:
             'overDueStreak': 0,
             'scoredMonths': scoredMonths,
             'expectedPaymentAmount': expectedPaymentAmount,
-            'error': ScoreError.LEASE_NOT_STARTED.name
+            'error': ScoreError.START_DATE_IN_FUTURE.name
         }
 
     while start <= paymentEndDate and start <= currentDate:
@@ -92,13 +56,13 @@ def getScore(scoreInput: ScoreInput) -> Score:
             actualPayments = 0
 
             for payment in scoreInput['payments']:
-                if datetime.fromisoformat(payment['date']) < start:
+                if parser.isoparse(payment['date']) < start:
                     # todo: using payment.amount.toString() since actualPayments sum is being prefixed with 0 for some reason
                     actualPayments += payment['amount']
                 else:
                     break
 
-                lastPaymentDate = datetime.fromisoformat(payment['date'])
+                lastPaymentDate = parser.isoparse(payment['date'])
 
             scoredMonth = getScoredMonth(
                 expectedPaymentAmount,

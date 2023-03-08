@@ -1,5 +1,5 @@
 {
-  "body": "{\"startDate\":\"2017-07-21T17:32:28Z\",\"endDate\":\"2018-07-21T17:32:28Z\",\"expectedPaymentDay\":1,\"expectedPaymentAmount\":5000,\"payments\":[{\"amount\":2000,\"date\":\"2017-07-21T17:32:28Z\"}]}",
+  "body": "{\"paymentStartDate\":\"2017-07-21T17:32:28Z\",\"paymentEndDate\":\"2018-07-21T17:32:28Z\",\"expectedPaymentDay\":1,\"expectedPaymentAmount\":5000,\"payments\":[{\"amount\":2000,\"date\":\"2017-07-21T17:32:28Z\"}]}",
   "resource": "/{proxy+}",
   "path": "/path/to/resource",
   "httpMethod": "POST",
