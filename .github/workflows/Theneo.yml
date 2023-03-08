@@ -18,6 +18,6 @@ jobs:
       - name: process documentation on server
         uses: theneoAPIDoc/api-documentation@main
         with:
-          PATH: doc/api.yml
+          PATH: docs/api.yml
           PROJECT_KEY: ${{secrets.PROJECT_KEY}}
           SECRET: ${{secrets.SECRET}}
