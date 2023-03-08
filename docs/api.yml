@@ -4,7 +4,7 @@ info:
   description: "Generate Payment Scores for your users based on scheduled terms and payment history"
   version: "1.0.0"
 servers:
-- url: "https://api.openfinance.africa"
+  - url: "https://api.openfinance.africa"
 paths:
   /score:
     post:
@@ -34,17 +34,20 @@ components:
       properties:
         overallScore:
           type: "number"
-          description: "The overall Payment Score. The range is between 0 and 1 (with\
+          description:
+            "The overall Payment Score. The range is between 0 and 1 (with\
             \ 1 being an excellent score)"
         paidStreak:
           type: "integer"
-          description: "This number represents the longest continous on-time (fully\
+          description:
+            "This number represents the longest continous on-time (fully\
             \ paid) number of payments. E.g. if on-time payments were made 5 months\
             \ in a row, this number will be 5"
           format: "int32"
         overDueStreak:
           type: "integer"
-          description: "This number represents the longest continous overdue number\
+          description:
+            "This number represents the longest continous overdue number\
             \ of payments. E.g. if payments were overdue for 2 months in a row, this\
             \ number will be 2"
           format: "int32"
@@ -58,7 +61,8 @@ components:
           type: "integer"
           description: "The payment amount expected"
           format: "int32"
-      description: "The Payment Score which includes an overall score and scored months\
+      description:
+        "The Payment Score which includes an overall score and scored months\
         \ that correspond to the input that was provided."
     Payment:
       type: "object"
@@ -69,7 +73,8 @@ components:
           description: "The amount that was paid."
         date:
           type: "string"
-          description: "The date that the payment was made. The format should be date-time\
+          description:
+            "The date that the payment was made. The format should be date-time\
             \ as defined by \"RFC 3339, section 5.6\" (https://tools.ietf.org/html/rfc3339#section-5.6)"
           format: "date-time"
       description: "Defines a payment made with a date and amount"
@@ -83,7 +88,8 @@ components:
           description: "The Payment Score of the month."
         dueDate:
           type: "string"
-          description: "The day of the month that a payment is supposed to be made.\
+          description:
+            "The day of the month that a payment is supposed to be made.\
             \ The format is a full-date as defined by \"RFC 3339, section 5.6\" (https://tools.ietf.org/html/rfc3339#section-5.6).\
             \ While the format used is a full date (with time included), only the\
             \ day, month, and year are relevant. E.g. if payment was due on March\
@@ -91,15 +97,17 @@ components:
           format: "date-time"
         balance:
           type: "number"
-          description: "The payment balance of the month. This can be positive if\
+          description:
+            "The payment balance of the month. This can be positive if\
             \ there was overpayment or negative if arrears exist."
-      description: "A scored month that is combined with others to provide an overall\
+      description:
+        "A scored month that is combined with others to provide an overall\
         \ score. It corresponds to an expected payment date that was provided in the\
         \ input."
     Error:
       required:
-      - "code"
-      - "message"
+        - "code"
+        - "message"
       type: "object"
       properties:
         code:
@@ -111,7 +119,8 @@ components:
       properties:
         startDate:
           type: "string"
-          description: "The date that the payments are supposted to start. The format\
+          description:
+            "The date that the payments are supposted to start. The format\
             \ should be full-date as defined by \"RFC 3339, section 5.6\" (https://tools.ietf.org/html/rfc3339#section-5.6).\
             \ While the format used is a full date (with time included), only the\
             \ day, month, and year are relevant. E.g. if the start date is January\
@@ -119,7 +128,8 @@ components:
           format: "date-time"
         endDate:
           type: "string"
-          description: "The date that the payments are supposted to end. The format\
+          description:
+            "The date that the payments are supposted to end. The format\
             \ should be full-date as defined by \"RFC 3339, section 5.6\" (https://tools.ietf.org/html/rfc3339#section-5.6).\
             \ While the format used is a full date (with time included), only the\
             \ day, month, and year are relevant. E.g. if the end date is December\
@@ -129,7 +139,8 @@ components:
           maximum: 31
           minimum: 1
           type: "integer"
-          description: "The expected day of the month that the payments are supposed\
+          description:
+            "The expected day of the month that the payments are supposed\
             \ to be made. E.g. \"1\" if the payments are supposed to be made every\
             \ 1st of the month"
           format: "int32"
@@ -143,11 +154,12 @@ components:
           description: "An array of payments that have been made"
           items:
             $ref: "#/components/schemas/Payment"
-      description: "Input required to get a score. It includes the terms of payment\
+      description:
+        "Input required to get a score. It includes the terms of payment\
         \ (e.g. lease details) and the payments that have been made"
     PaymentStatus:
       type: "string"
       enum:
-      - "PAID"
-      - "OVERPAID"
-      - "OVERDUE"
+        - "PAID"
+        - "OVERPAID"
+        - "OVERDUE"

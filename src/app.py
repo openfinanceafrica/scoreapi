@@ -25,14 +25,14 @@ def lambda_handler(event, context):
         Return doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
     """
 
-    error = validateScoreInput(event['body'])
+    error = validateScoreInput(event["body"])
     if error != None:
         return {
-            'statusCode': 400,
-            'body': 'Bad Request. %s' % error,
+            "statusCode": 400,
+            "body": "Bad Request. %s" % error,
         }
 
-    score = getScore(json.loads(event['body']))
+    score = getScore(json.loads(event["body"]))
     return {
         "statusCode": 200,
         "body": json.dumps(score),

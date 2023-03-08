@@ -3,14 +3,14 @@ from enum import Enum
 
 
 class PaymentStatus(Enum):
-    PAID = 'PAID'
-    PAID_PARTIALLY = 'PAID_PARTIALLY'
-    OVERPAID = 'OVERPAID'
-    PAID_LATE = 'PAID_LATE'
-    OVERDUE = 'OVERDUE'
-    UPCOMING = 'UPCOMING'
-    PENDING = 'PENDING'
-    UNKNOWN = 'UNKNOWN'
+    PAID = "PAID"
+    PAID_PARTIALLY = "PAID_PARTIALLY"
+    OVERPAID = "OVERPAID"
+    PAID_LATE = "PAID_LATE"
+    OVERDUE = "OVERDUE"
+    UPCOMING = "UPCOMING"
+    PENDING = "PENDING"
+    UNKNOWN = "UNKNOWN"
 
 
 class ScoredMonth(TypedDict):
@@ -37,8 +37,8 @@ class ScoreInput(TypedDict):
 
 
 class ScoreError(Enum):
-    START_DATE_IN_FUTURE = 'START_DATE_IN_FUTURE'
-    NO_SCORED_MONTHS = 'NO_SCORED_MONTHS'
+    START_DATE_IN_FUTURE = "START_DATE_IN_FUTURE"
+    NO_SCORED_MONTHS = "NO_SCORED_MONTHS"
 
 
 class Score(TypedDict):
