@@ -4,7 +4,7 @@ info:
   description: "Generate Payment Scores for your users based on payment agreement terms and payment history"
   version: "1.0.0"
 servers:
-- url: "https://api.openfinance.africa/score"
+- url: "https://api.openfinance.africa"
 paths:
   /score:
     post:

@@ -1,0 +1,23 @@
+name: Update documention
+on:
+  pull_request:
+    branches:
+      - main
+jobs:
+  update-doc:
+    name: update theneo doc
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - name: process documentation on server
+        uses: theneoAPIDoc/api-documentation@main
+        with:
+          PATH: doc/api.yml
+          PROJECT_KEY: ${{secrets.PROJECT_KEY}}
+          SECRET: ${{secrets.SECRET}}
