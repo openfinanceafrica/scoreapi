@@ -136,7 +136,7 @@ def getScoredMonth(expectedPaymentAmount: int, amountPaid: int, expectedPayment:
     if balance > 0:
         score = 1 + (balance / expectedPaymentAmount) * 0.01
         score = score
-        status = PaymentStatus.OVERPAID
+        status = PaymentStatus.OVERPAID.name
 
     if balance < 0:
         score = 0
