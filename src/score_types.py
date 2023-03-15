@@ -46,6 +46,6 @@ class Score(TypedDict):
     paidStreak: int
     overDueStreak: int
     scoredMonths: List[ScoredMonth]
-    rent: int
+    expectedPaymentAmount: int
     balance: int
     error: Optional[ScoreError]

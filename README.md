@@ -72,7 +72,7 @@ scoreapi$ sam local invoke ScoreApiFunction --event events/event.json
 The SAM CLI can also emulate your application's API. Use the `sam local start-api` to run the API locally on port 3000.
 
 ```bash
-scoreapi$ sam local start-api
+scoreapi$ sam local start-api -p 3001
 scoreapi$ curl http://localhost:3000/
 ```
 
