@@ -1,7 +1,7 @@
 openapi: "3.0.1"
 info:
   title: "Open Finance Africa / Score API"
-  description: "Introducing Score API designed to standardize credit scoring in Africa and beyond 🚀
+  description: "<p>Introducing Score API designed to standardize credit scoring in Africa and beyond 🚀 <br/>
 
 This API aims to revolutionize the way financial institutions and lenders assess the creditworthiness of individuals and businesses.
 
@@ -13,7 +13,7 @@ The first version of this API is hopefully just the tip of the iceberg. It simpl
 
 For detailed information on how this is done, visit the Github page on https://github.com/openfinanceafrica/scoreapi
 
-We invite all interested parties to try our API and contribute to its ongoing development. By working together, we can create a standardized and transparent credit scoring system that benefits both lenders and borrowers alike!"
+We invite all interested parties to try our API and contribute to its ongoing development. By working together, we can create a standardized and transparent credit scoring system that benefits both lenders and borrowers alike!</p>"
   version: "1.0.0"
 servers:
   - url: "https://api.openfinance.africa"
