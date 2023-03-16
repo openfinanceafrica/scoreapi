@@ -1,7 +1,19 @@
 openapi: "3.0.1"
 info:
   title: "Open Finance Africa / Score API"
-  description: "Generate Payment Scores for your users based on scheduled terms and payment history"
+  description: "Introducing Score API designed to standardize credit scoring in Africa and beyond 🚀
+
+This API aims to revolutionize the way financial institutions and lenders assess the creditworthiness of individuals and businesses.
+
+Banks already have siloed account data (debits and credits) but lack information about external payment schedules (e.g. if a rent payment was late or not). Additionally, the process of determining creditworthiness has not been transparent.
+
+The goal of this API is to enable financial institutions and lenders (or anyone!) to make more informed lending decisions. With access to accurate credit scores, lenders can better assess the risk associated with lending to a particular individual or business, ultimately leading to more responsible lending practices and reduced default rates.
+
+The first version of this API is hopefully just the tip of the iceberg. It simply ingests payment terms and history, and then outputs a score. 
+
+For detailed information on how this is done, visit the Github page on https://github.com/openfinanceafrica/scoreapi
+
+We invite all interested parties to try our API and contribute to its ongoing development. By working together, we can create a standardized and transparent credit scoring system that benefits both lenders and borrowers alike!"
   version: "1.0.0"
 servers:
   - url: "https://api.openfinance.africa"
