@@ -1,12 +1,24 @@
 import json
-from constants import (
-    EXPECTED_PAYMENT_DAY_MAXIMUM,
-    EXPECTED_PAYMENT_DAY_MINIMUM,
-    EXPECTED_PAYMENT_AMOUNT_MINIMUM,
-)
-from score_types import ScoreInput
 from dateutil import parser
 import collections.abc
+import os
+
+isUnitTest = False if os.getenv("LAMBDA_TASK_ROOT") else True
+
+if isUnitTest:
+    from src.score_types import ScoreInput
+    from src.constants import (
+        EXPECTED_PAYMENT_DAY_MAXIMUM,
+        EXPECTED_PAYMENT_DAY_MINIMUM,
+        EXPECTED_PAYMENT_AMOUNT_MINIMUM,
+    )
+else:
+    from score_types import ScoreInput
+    from constants import (
+        EXPECTED_PAYMENT_DAY_MAXIMUM,
+        EXPECTED_PAYMENT_DAY_MINIMUM,
+        EXPECTED_PAYMENT_AMOUNT_MINIMUM,
+    )
 
 
 def validateScoreInput(input: ScoreInput):

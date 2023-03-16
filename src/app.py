@@ -1,6 +1,14 @@
 import json
-from score import getScore
-from validation import validateScoreInput
+import os
+
+isUnitTest = False if os.getenv("LAMBDA_TASK_ROOT") else True
+
+if isUnitTest:
+    from src.score import getScore
+    from src.validation import validateScoreInput
+else:
+    from score import getScore
+    from validation import validateScoreInput
 
 
 def lambda_handler(event, context):

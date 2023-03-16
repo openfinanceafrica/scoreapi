@@ -1,14 +1,32 @@
 from typing import List
 from datetime import timedelta, datetime, timezone
-from score_types import PaymentStatus, Score, ScoreError, ScoreInput, ScoredMonth
 from dateutil import parser
+import os
 
-from constants import (
-    PREVIOUS_PAYMENTS_BONUS_COEFFICIENT,
-    SCORE_COEFFICIENT,
-    TIME_BONUS_AFTER_DUE_DATE_COEFFICIENT,
-    TIME_BONUS_COEFFICIENT,
-)
+isUnitTest = False if os.getenv("LAMBDA_TASK_ROOT") else True
+
+if isUnitTest:
+    from src.score_types import (
+        PaymentStatus,
+        Score,
+        ScoreError,
+        ScoreInput,
+        ScoredMonth,
+    )
+    from src.constants import (
+        PREVIOUS_PAYMENTS_BONUS_COEFFICIENT,
+        SCORE_COEFFICIENT,
+        TIME_BONUS_AFTER_DUE_DATE_COEFFICIENT,
+        TIME_BONUS_COEFFICIENT,
+    )
+else:
+    from score_types import PaymentStatus, Score, ScoreError, ScoreInput, ScoredMonth
+    from constants import (
+        PREVIOUS_PAYMENTS_BONUS_COEFFICIENT,
+        SCORE_COEFFICIENT,
+        TIME_BONUS_AFTER_DUE_DATE_COEFFICIENT,
+        TIME_BONUS_COEFFICIENT,
+    )
 
 
 def getScore(scoreInput: ScoreInput) -> Score:
