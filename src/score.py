@@ -21,7 +21,11 @@ def getScore(scoreInput: ScoreInput) -> Score:
 
     paymentStartDate = parser.isoparse(scoreInput["paymentStartDate"])
     start = paymentStartDate
-    paymentEndDate = parser.isoparse(scoreInput["paymentEndDate"])
+    paymentEndDate = (
+        parser.isoparse(scoreInput["paymentEndDate"])
+        if scoreInput.get("paymentEndDate")
+        else datetime.now(timezone.utc)
+    )
     expectedPaymentDay = scoreInput["expectedPaymentDay"]
     expectedPaymentAmount = scoreInput["expectedPaymentAmount"]
     totalScore = 0
@@ -33,11 +37,6 @@ def getScore(scoreInput: ScoreInput) -> Score:
     overDueStreak = 0
     longestOverDueStreak = 0
     balance = 0
-    currentDate = (
-        parser.isoparse(scoreInput["currentDate"])
-        if scoreInput.get("currentDate")
-        else datetime.now(timezone.utc)
-    )
 
     # We need to ensure that we are consistently using timezone aware dates so we don't get the error:
     # "can't compare offset-naive and offset-aware datetimes"
@@ -53,8 +52,6 @@ def getScore(scoreInput: ScoreInput) -> Score:
         or paymentEndDate.tzinfo.utcoffset(paymentEndDate) is None
     ):
         paymentEndDate = paymentEndDate.astimezone()
-    if currentDate.tzinfo is None or currentDate.tzinfo.utcoffset(currentDate) is None:
-        currentDate = currentDate.astimezone()
 
     # If paymentStartDate is still in the future and scoreBeforeStartDate isn't specified in the request,
     # we'll exit immediately. It's not necessarily an error but we want users to explicitly say whether
@@ -71,10 +68,8 @@ def getScore(scoreInput: ScoreInput) -> Score:
             "expectedPaymentAmount": expectedPaymentAmount,
             "error": ScoreError.START_DATE_IN_FUTURE.name,
         }
-
-    while start <= paymentEndDate and start <= currentDate:
-        # "expectedPaymentDay + 1" since the payments would be considered late after the expected payment day
-        if (expectedPaymentDay + 1) == start.day:
+    while start <= paymentEndDate:
+        if expectedPaymentDay == start.day:
             expectedPayments += expectedPaymentAmount
             lastPaymentDate = None
             actualPayments = 0
@@ -82,15 +77,15 @@ def getScore(scoreInput: ScoreInput) -> Score:
             actualPaymentsAfterDueDate = 0
 
             for payment in scoreInput["payments"]:
-                # Get the actual total payments made before the due date and also keep track of the
+                # Get the actual total payments made before or on the due date and also keep track of the
                 # last payment date (the earlier the payment, the better if balance is paid off)
-                if parser.isoparse(payment["date"]) < start:
-                    actualPayments += payment["amount"]
+                if parser.isoparse(payment["date"]) <= start:
+                    actualPayments += int(payment["amount"])
                     lastPaymentDate = parser.isoparse(payment["date"])
                 # Get the date when the balance was paid. The delta between the due date and the time the balance was
                 # paid off will be a factor in scoring.
                 else:
-                    actualPaymentsAfterDueDate += payment["amount"]
+                    actualPaymentsAfterDueDate += int(payment["amount"])
                     if (
                         (actualPayments + actualPaymentsAfterDueDate) - expectedPayments
                     ) >= 0:
@@ -103,11 +98,10 @@ def getScore(scoreInput: ScoreInput) -> Score:
                 expectedPaymentAmount,
                 actualPayments,
                 expectedPayments,
-                start - timedelta(days=1),
+                start,
                 lastPaymentDate,
                 balancePaymentDateAfterDueDate,
             )
-            # print('s:', scoredMonth)
 
             scoredMonths.append(scoredMonth)
             totalScore += scoredMonth["score"]
@@ -172,7 +166,6 @@ def getScoredMonth(
     """
 
     score = None
-    fullOrPartialPaymentMade = True
     status = PaymentStatus.UNKNOWN.name
 
     balance = amountPaid - expectedPayments
@@ -187,8 +180,10 @@ def getScoredMonth(
 
     # Get a time bonus based on how early the payment was made before the due date
     timeBonus = 0
-    if dueDate < lastPaymentDate:
-        timeBonus = (dueDate - lastPaymentDate).days * TIME_BONUS_COEFFICIENT
+    if lastPaymentDate < dueDate:
+        # need to use 'total_seconds' rather than 'days' for accuracy
+        days = (dueDate - lastPaymentDate).total_seconds() / (24 * 60 * 60)
+        timeBonus = round(days * TIME_BONUS_COEFFICIENT, 2)
 
     if balance == 0:
         score = 1
@@ -202,14 +197,16 @@ def getScoredMonth(
 
     if balance < 0:
         score = 0
-        fullOrPartialPaymentMade = False
         status = PaymentStatus.OVERDUE.name
         # Get a time bonus based on how early the payment was made after the due date
         if balancePaymentDateAfterDueDate:
-            timeBonus = (
-                TIME_BONUS_AFTER_DUE_DATE_COEFFICIENT
-                / (balancePaymentDateAfterDueDate - dueDate).days
+            # need to use 'total_seconds' rather than 'days' for accuracy
+            days = (balancePaymentDateAfterDueDate - dueDate).total_seconds() / (
+                24 * 60 * 60
             )
+            timeBonus = round(1 - (days * TIME_BONUS_AFTER_DUE_DATE_COEFFICIENT), 2)
+            if timeBonus < 0:
+                timeBonus = 0
 
     if score == None:
         print("Score could not be calculated. Balance: %s" % balance)
@@ -220,8 +217,7 @@ def getScoredMonth(
             balance: balance,
         }
 
-    if fullOrPartialPaymentMade:
-        score = score + timeBonus
+    score = score + timeBonus
 
     # If the score is 0 we'll give credit for previous payments made
     if score == 0:

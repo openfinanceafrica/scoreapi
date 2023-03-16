@@ -23,16 +23,11 @@ def validateScoreInput(input: ScoreInput):
         return '"paymentStartDate" is invalid. The format should be full-date as defined by "RFC 3339, section 5.6" (https://tools.ietf.org/html/rfc3339#section-5.6). For example: "2023-03-08T07:15:32.42"'
 
     try:
-        parser.isoparse(inputObj["paymentEndDate"])
+        paymentEndDate = inputObj.get("paymentEndDate")
+        if paymentEndDate:
+            parser.isoparse(inputObj["paymentEndDate"])
     except Exception as e:
         return '"paymentEndDate" is invalid. The format should be full-date as defined by "RFC 3339, section 5.6" (https://tools.ietf.org/html/rfc3339#section-5.6). For example: "2023-03-08T07:15:32.42"'
-
-    try:
-        currentDate = inputObj.get("currentDate")
-        if currentDate:
-            parser.isoparse(inputObj["currentDate"])
-    except Exception as e:
-        return '"currentDate" is invalid. The format should be full-date as defined by "RFC 3339, section 5.6" (https://tools.ietf.org/html/rfc3339#section-5.6). For example: "2023-03-08T07:15:32.42"'
 
     try:
         if type(inputObj["expectedPaymentDay"]) != int and (

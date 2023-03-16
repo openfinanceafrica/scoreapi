@@ -27,13 +27,12 @@ class Payment(TypedDict):
 
 class ScoreInput(TypedDict):
     paymentStartDate: str
-    paymentEndDate: str
+    paymentEndDate: Optional[str]
     expectedPaymentDay: int
     expectedPaymentAmount: int
     payments: List[Payment]
     reference: Optional[str]
     scoreBeforeStartDate: Optional[bool]
-    currentDate: Optional[str]
 
 
 class ScoreError(Enum):
