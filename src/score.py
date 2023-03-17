@@ -190,10 +190,10 @@ def getScoredMonth(
 
     if not lastPaymentDate:
         return {
-            score: 0,
-            status: PaymentStatus.OVERDUE.name,
-            dueDate: dueDate,
-            balance: balance,
+            "score": 0,
+            "status": PaymentStatus.OVERDUE.name,
+            "dueDate": dueDate.isoformat(),
+            "balance": balance,
         }
 
     # Get a time bonus based on how early the payment was made before the due date
@@ -229,10 +229,10 @@ def getScoredMonth(
     if score == None:
         print("Score could not be calculated. Balance: %s" % balance)
         return {
-            score: -1,
-            status: PaymentStatus.UNKNOWN.name,
-            dueDate: dueDate,
-            balance: balance,
+            "score": -1,
+            "status": PaymentStatus.UNKNOWN.name,
+            "dueDate": dueDate.isoformat(),
+            "balance": balance,
         }
 
     score = score + timeBonus
