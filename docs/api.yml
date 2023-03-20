@@ -1,15 +1,18 @@
 openapi: "3.0.1"
 info:
-  title: "Open Finance Africa / Score API"
-  description: "<p>Introducing Score API designed to standardize credit scoring in Africa and beyond 🚀 <br/>
+  title: "Open Finance Africa / Payment Score API"
+  description: "<p>Introducing Payment Score API - designed to standardize credit scoring in Africa and beyond 🚀 <br/><br/>
 
-This API aims to revolutionize the way financial institutions and lenders assess the creditworthiness of individuals and businesses.
+This API aims to revolutionize the way financial institutions and lenders assess the creditworthiness of individuals and businesses.<br/><br/>
 
-Banks already have siloed account data (debits and credits) but lack information about external payment schedules (e.g. if a rent payment was late or not). Additionally, the process of determining creditworthiness has not been transparent.
+Banks already have siloed account data (debits and credits) but lack information about external payment schedules (e.g. if a rent payment was late or not). 
+Additionally, the process of determining creditworthiness has not been transparent. <br/><br/>
 
-The goal of this API is to enable financial institutions and lenders (or anyone!) to make more informed lending decisions. With access to accurate credit scores, lenders can better assess the risk associated with lending to a particular individual or business, ultimately leading to more responsible lending practices and reduced default rates.
+The goal of this API is to enable financial institutions and lenders (or anyone!) to make more informed lending decisions. 
+With access to accurate credit scores, lenders can better assess the risk associated with lending to a particular individual or business, 
+ultimately leading to more responsible lending practices and reduced default rates. <br/><br/>
 
-The first version of this API is hopefully just the tip of the iceberg. It simply ingests payment terms and history, and then outputs a score. 
+The first version of this API is hopefully just the tip of the iceberg. It simply ingests payment terms and history, and then outputs a score. <br/><br/>
 
 For detailed information on how this is done, visit the Github page on https://github.com/openfinanceafrica/scoreapi
 
@@ -68,10 +71,15 @@ components:
           description: "An array of scored months"
           items:
             $ref: "#/components/schemas/ScoredMonth"
-        amount:
+        expectedPaymentAmount:
           minimum: 1
           type: "integer"
           description: "The payment amount expected"
+          format: "int32"
+        balance:
+          type: "integer"
+          description:
+            "The total remaining balance based on payment history and the amount expected to have been paid. This can be a negative number if money is owed or a positive number in cases of overpayment"
           format: "int32"
       description:
         "The Payment Score which includes an overall score and scored months\
@@ -129,7 +137,7 @@ components:
     ScoreInput:
       type: "object"
       properties:
-        startDate:
+        paymentStartDate:
           type: "string"
           description:
             "The date that the payments are supposted to start. The format\
@@ -138,7 +146,7 @@ components:
             \ day, month, and year are relevant. E.g. if the start date is January\
             \ 1st 2023, payments are expected to start anytime within that day."
           format: "date-time"
-        endDate:
+        paymentEndDate:
           type: "string"
           description:
             "The date that the payments are supposted to end. The format\
@@ -166,6 +174,14 @@ components:
           description: "An array of payments that have been made"
           items:
             $ref: "#/components/schemas/Payment"
+        reference:
+          minimum: 1
+          type: "string"
+          description: "Not currently used. In future this will be an optional field to send a custom identifier that can be used to query previous API calls"
+        scoreBeforeStartDate:
+          minimum: 1
+          type: "boolean"
+          description: "If this is false, and the payment start date is before the current date, no score will be returned. Set this to true if you want to override this behavior"
       description:
         "Input required to get a score. It includes the terms of payment\
         \ (e.g. lease details) and the payments that have been made"
