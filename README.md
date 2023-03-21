@@ -1,4 +1,4 @@
-# Score API
+# Payment Score API
 
 This project contains source code and supporting files for the [Open Finance Africa](https://openfinance.africa) Payment
 Score API. The API is available for consumption at *https//api.openfinance.africa*. 
@@ -12,8 +12,9 @@ TL;DR: Head over to the [simulator](https://openfinance.africa/simulator) to see
 
 
 A credit score usually takes several factors into account. These factors range from previous loan repayment behavior, down to an individuals age.
-Banks and credit bureaus have the capacity to aggregate this data and use it to evaluate rates for loans for example. 
-For now, the goal of this repo to simply calculate a payment score. And this score can be used as a datapoint among the factors that lenders (or other financial institutions) may use to determine an individuals creditworthiness. 
+Banks and credit bureaus (CRBs) already have the ability to aggregate this data and use it to evaluate loans terms for example. 
+But accessing standardized *external* payment data, easily accessible via API is what this project is about.
+For now, the code in this repo simply calculates a payment score. And this score can be used as a datapoint among the factors that lenders (or other financial institutions) may use to determine an individuals creditworthiness.
 Banks and credit bureaus aren't the only entities that can find this useful. If you're a business that wants to keep track of payment behaviour, this is for you! E.g. if you're a property management company that want's to keep track of rent payment behavior.
 
 ### Input Values
