@@ -30,11 +30,14 @@ else:
 
 
 def getScore(scoreInput: ScoreInput) -> Score:
-    """Form a complex number.
+    """Main function that calculates and returns a score
 
     Keyword arguments:
-    real -- the real part (default 0.0)
-    imag -- the imaginary part (default 0.0)
+    ScoreInput -- This is an object that includes:
+    1. A start and end date, the day of the month a payment is expected, and the amount expected.
+    For example, a tenant may have a lease which starts on Jan 1 2024 (start) to Dec 31 2024 (end) and expected payment date of the 5th.
+    2. A list of payments that have been made by the individual getting scored. This includes the date/time that the payment was made as well as the amount.
+    See the definition on score_types.py to see all the fields available.
     """
 
     paymentStartDate = parser.isoparse(scoreInput["paymentStartDate"])
@@ -47,7 +50,7 @@ def getScore(scoreInput: ScoreInput) -> Score:
     expectedPaymentDay = scoreInput["expectedPaymentDay"]
     expectedPaymentAmount = scoreInput["expectedPaymentAmount"]
     totalScore = 0
-    expectedPayments = 0
+    totalExpectedPayments = 0
     scoredMonths: List[ScoredMonth] = []
     overallScore = 0
     paidStreak = 0
@@ -88,7 +91,7 @@ def getScore(scoreInput: ScoreInput) -> Score:
         }
     while start <= paymentEndDate:
         if expectedPaymentDay == start.day:
-            expectedPayments += expectedPaymentAmount
+            totalExpectedPayments += expectedPaymentAmount
             lastPaymentDate = None
             actualPayments = 0
             balancePaymentDateAfterDueDate = None
@@ -105,7 +108,8 @@ def getScore(scoreInput: ScoreInput) -> Score:
                 else:
                     actualPaymentsAfterDueDate += int(payment["amount"])
                     if (
-                        (actualPayments + actualPaymentsAfterDueDate) - expectedPayments
+                        (actualPayments + actualPaymentsAfterDueDate)
+                        - totalExpectedPayments
                     ) >= 0:
                         balancePaymentDateAfterDueDate = parser.isoparse(
                             payment["date"]
@@ -115,7 +119,7 @@ def getScore(scoreInput: ScoreInput) -> Score:
             scoredMonth = getScoredMonth(
                 expectedPaymentAmount,
                 actualPayments,
-                expectedPayments,
+                totalExpectedPayments,
                 start,
                 lastPaymentDate,
                 balancePaymentDateAfterDueDate,
@@ -171,22 +175,26 @@ def getScore(scoreInput: ScoreInput) -> Score:
 def getScoredMonth(
     expectedPaymentAmount: int,
     amountPaid: int,
-    expectedPayments: int,
+    totalExpectedPayments: int,
     dueDate: datetime,
     lastPaymentDate: datetime,
     balancePaymentDateAfterDueDate: datetime,
 ) -> ScoredMonth:
-    """Form a complex number.
+    """Calculates the score of an individual month
 
     Keyword arguments:
-    real -- the real part (default 0.0)
-    imag -- the imaginary part (default 0.0)
+    expectedPaymentAmount -- The amount expected to be paid each month
+    amountPaid -- The total amount/balance that has been paid so far
+    totalExpectedPayments -- The total amount/balance that is expected to be paid by "dueDate"
+    dueDate -- The date in the month that is derived from the day a payment is expected
+    lastPaymentDate -- The date that the last payment was made before "dueDate"
+    balancePaymentDateAfterDueDate -- The date after "dueDate" when the balance was paid (if payment was late)
     """
 
     score = None
     status = PaymentStatus.UNKNOWN.name
 
-    balance = amountPaid - expectedPayments
+    balance = amountPaid - totalExpectedPayments
 
     if not lastPaymentDate:
         return {
@@ -240,7 +248,7 @@ def getScoredMonth(
     # If the score is 0 we'll give credit for previous payments made
     if score == 0:
         overallPaymentsBonus = (
-            amountPaid / expectedPayments
+            amountPaid / totalExpectedPayments
         ) * PREVIOUS_PAYMENTS_BONUS_COEFFICIENT
         score += overallPaymentsBonus
 
