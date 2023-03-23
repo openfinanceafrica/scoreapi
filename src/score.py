@@ -195,8 +195,7 @@ def getScoredMonth(
     status = PaymentStatus.UNKNOWN.name
 
     balance = amountPaid - totalExpectedPayments
-
-    if not lastPaymentDate:
+    if not lastPaymentDate and not balancePaymentDateAfterDueDate:
         return {
             "score": 0,
             "status": PaymentStatus.OVERDUE.name,
@@ -206,7 +205,7 @@ def getScoredMonth(
 
     # Get a time bonus based on how early the payment was made before the due date
     timeBonus = 0
-    if lastPaymentDate < dueDate and balance >= 0:
+    if lastPaymentDate and lastPaymentDate < dueDate and balance >= 0:
         # need to use 'total_seconds' rather than 'days' for accuracy
         days = (dueDate - lastPaymentDate).total_seconds() / (24 * 60 * 60)
         timeBonus = round(days * TIME_BONUS_COEFFICIENT, 2)
