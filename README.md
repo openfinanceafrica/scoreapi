@@ -1,8 +1,8 @@
 # Payment Score API
 
-This project contains source code and supporting files for the [Open Finance Africa](https://openfinance.africa) Payment
-Score API. The API is available for consumption at *https//api.openfinance.africa*. 
-The API reference can be found [here](https://app.theneo.io/open-finance-africa/documentation). 
+This project contains source code and supporting files for the [Open Finance Africa](https://openfinance.africa) Payment Score API. 
+The API is available for consumption at *https//api.openfinance.africa* and its reference is [here](https://app.theneo.io/open-finance-africa/documentation).
+Although the current functionality could have been bundled and utilized as a library, the current plan is to examine its application as an API and, over time, expand it to incorporate data sources where a library would not be suitable.
 
 <br/>
 
