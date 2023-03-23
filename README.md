@@ -119,6 +119,8 @@ scoreapi$ black .
 
 ## Contributing
 
-We welcome contributions ❤️ 
+We welcome contributions both big and small ❤️ 
 
-To get added as a contributor contact us at hello@openfinance.africa
+Create issues or pull requests to get started!
+
+Anything else, contact [hello@openfinance.africa](mailto:hello@openfinance.africa)
