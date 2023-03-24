@@ -24,6 +24,10 @@ else:
 def validateScoreInput(input: ScoreInput):
     error = None
     inputObj = None
+
+    if not input:
+        return "Input is empty, make sure you have a valid ScoreInput object in the request body."
+
     try:
         inputObj = json.loads(input)
     except:

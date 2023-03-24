@@ -2,6 +2,7 @@ from typing import List
 from datetime import timedelta, datetime, timezone
 from dateutil import parser
 import os
+import pytz
 
 isUnitTest = False if os.getenv("LAMBDA_TASK_ROOT") else True
 
@@ -62,17 +63,18 @@ def getScore(scoreInput: ScoreInput) -> Score:
     # We need to ensure that we are consistently using timezone aware dates so we don't get the error:
     # "can't compare offset-naive and offset-aware datetimes"
     # If timezone info isn't included in a date within the request the it's assumed to be UTC.
+    # We do this in other places in this file as well.
     if (
         paymentStartDate.tzinfo is None
         or paymentStartDate.tzinfo.utcoffset(paymentStartDate) is None
     ):
-        paymentStartDate = paymentStartDate.astimezone()
+        paymentStartDate = pytz.utc.localize(paymentStartDate)
         start = paymentStartDate
     if (
         paymentEndDate.tzinfo is None
         or paymentEndDate.tzinfo.utcoffset(paymentEndDate) is None
     ):
-        paymentEndDate = paymentEndDate.astimezone()
+        paymentEndDate = pytz.utc.localize(paymentEndDate)
 
     # If paymentStartDate is still in the future and scoreBeforeStartDate isn't specified in the request,
     # we'll exit immediately. It's not necessarily an error but we want users to explicitly say whether
@@ -98,9 +100,13 @@ def getScore(scoreInput: ScoreInput) -> Score:
             actualPaymentsAfterDueDate = 0
 
             for payment in scoreInput["payments"]:
+                date = parser.isoparse(payment["date"])
+                if date.tzinfo is None or date.tzinfo.utcoffset(date) is None:
+                    date = pytz.utc.localize(date)
+
                 # Get the actual total payments made before or on the due date and also keep track of the
                 # last payment date (the earlier the payment, the better if balance is paid off)
-                if parser.isoparse(payment["date"]) <= start:
+                if date <= start:
                     actualPayments += int(payment["amount"])
                     lastPaymentDate = parser.isoparse(payment["date"])
                 # Get the date when the balance was paid. The delta between the due date and the time the balance was
@@ -202,6 +208,12 @@ def getScoredMonth(
             "dueDate": dueDate.isoformat(),
             "balance": balance,
         }
+
+    if (
+        lastPaymentDate.tzinfo is None
+        or lastPaymentDate.tzinfo.utcoffset(lastPaymentDate) is None
+    ):
+        lastPaymentDate = pytz.utc.localize(lastPaymentDate)
 
     # Get a time bonus based on how early the payment was made before the due date
     timeBonus = 0
