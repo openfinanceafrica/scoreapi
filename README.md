@@ -121,6 +121,6 @@ scoreapi$ black .
 
 We welcome contributions both big and small ❤️ 
 
-Create issues or pull requests to get started!
+Any questions or feedback? Create an issue
 
-Anything else, contact [hello@openfinance.africa](mailto:hello@openfinance.africa)
+Want to modify code or docs? Ask to get added as a contributor by emailing [hello@openfinance.africa](mailto:hello@openfinance.africa) or simply fork the repo to create pull requests
