@@ -15,18 +15,18 @@ if isUnitTest:
         ScoredMonth,
     )
     from src.constants import (
-        PREVIOUS_PAYMENTS_BONUS_COEFFICIENT,
-        SCORE_COEFFICIENT,
-        TIME_BONUS_AFTER_DUE_DATE_COEFFICIENT,
-        TIME_BONUS_COEFFICIENT,
+        PREVIOUS_PAYMENTS_BONUS_MULTIPLIER,
+        SCORE_MULTIPLIER,
+        TIME_BONUS_AFTER_DUE_DATE_MULTIPLIER,
+        TIME_BONUS_MULTIPLIER,
     )
 else:
     from score_types import PaymentStatus, Score, ScoreError, ScoreInput, ScoredMonth
     from constants import (
-        PREVIOUS_PAYMENTS_BONUS_COEFFICIENT,
-        SCORE_COEFFICIENT,
-        TIME_BONUS_AFTER_DUE_DATE_COEFFICIENT,
-        TIME_BONUS_COEFFICIENT,
+        PREVIOUS_PAYMENTS_BONUS_MULTIPLIER,
+        SCORE_MULTIPLIER,
+        TIME_BONUS_AFTER_DUE_DATE_MULTIPLIER,
+        TIME_BONUS_MULTIPLIER,
     )
 
 
@@ -210,8 +210,8 @@ def getScoredMonth(
         }
 
     if (
-        lastPaymentDate.tzinfo is None
-        or lastPaymentDate.tzinfo.utcoffset(lastPaymentDate) is None
+        lastPaymentDate and (lastPaymentDate.tzinfo is None
+        or lastPaymentDate.tzinfo.utcoffset(lastPaymentDate) is None)
     ):
         lastPaymentDate = pytz.utc.localize(lastPaymentDate)
 
@@ -220,7 +220,7 @@ def getScoredMonth(
     if lastPaymentDate and lastPaymentDate < dueDate and balance >= 0:
         # need to use 'total_seconds' rather than 'days' for accuracy
         days = (dueDate - lastPaymentDate).total_seconds() / (24 * 60 * 60)
-        timeBonus = round(days * TIME_BONUS_COEFFICIENT, 2)
+        timeBonus = round(days * TIME_BONUS_MULTIPLIER, 2)
 
     if balance == 0:
         score = 1
@@ -228,7 +228,7 @@ def getScoredMonth(
         status = PaymentStatus.PAID.name
 
     if balance > 0:
-        score = 1 + (balance / expectedPaymentAmount) * SCORE_COEFFICIENT
+        score = 1 + (balance / expectedPaymentAmount) * SCORE_MULTIPLIER
         score = score
         status = PaymentStatus.OVERPAID.name
 
@@ -241,7 +241,7 @@ def getScoredMonth(
             days = (balancePaymentDateAfterDueDate - dueDate).total_seconds() / (
                 24 * 60 * 60
             )
-            timeBonus = round(1 - (days * TIME_BONUS_AFTER_DUE_DATE_COEFFICIENT), 2)
+            timeBonus = round(1 - (days * TIME_BONUS_AFTER_DUE_DATE_MULTIPLIER), 2)
             if timeBonus < 0:
                 timeBonus = 0
 
@@ -260,7 +260,7 @@ def getScoredMonth(
     if score == 0:
         overallPaymentsBonus = (
             amountPaid / totalExpectedPayments
-        ) * PREVIOUS_PAYMENTS_BONUS_COEFFICIENT
+        ) * PREVIOUS_PAYMENTS_BONUS_MULTIPLIER
         score += overallPaymentsBonus
 
     score = round(score, 2)
