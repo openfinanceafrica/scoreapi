@@ -1,6 +1,6 @@
 EXPECTED_PAYMENT_DAY_MINIMUM = 1
-# Based on February - minimum number of days in a month
-EXPECTED_PAYMENT_DAY_MAXIMUM = 28
+# Based on the shortest month (February) minus 1
+EXPECTED_PAYMENT_DAY_MAXIMUM = 27
 EXPECTED_PAYMENT_AMOUNT_MINIMUM = 1
 
 TIME_BONUS_AFTER_DUE_DATE_MULTIPLIER = 0.01

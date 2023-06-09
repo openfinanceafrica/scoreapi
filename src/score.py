@@ -1,5 +1,5 @@
 from typing import List
-from datetime import timedelta, datetime, timezone
+from datetime import timedelta, datetime, timezone, time
 from dateutil import parser
 import os
 import pytz
@@ -91,8 +91,13 @@ def getScore(scoreInput: ScoreInput) -> Score:
             "expectedPaymentAmount": expectedPaymentAmount,
             "error": ScoreError.START_DATE_IN_FUTURE.name,
         }
+    
     while start <= paymentEndDate:
-        if expectedPaymentDay == start.day:
+        # We want to do our calculation on expectedPaymentDay + 1 to allow
+        # for payments made at the last minute of the expected payment day
+        if expectedPaymentDay + 1 == start.day:
+            # Since we've essentially fast forwarded a day, let's use current in place of start in this block
+            current = start - timedelta(days=1)
             totalExpectedPayments += expectedPaymentAmount
             lastPaymentDate = None
             actualPayments = 0
@@ -106,7 +111,8 @@ def getScore(scoreInput: ScoreInput) -> Score:
 
                 # Get the actual total payments made before or on the due date and also keep track of the
                 # last payment date (the earlier the payment, the better if balance is paid off)
-                if date <= start:
+                currentMax = pytz.utc.localize(datetime.combine(current, time.max))
+                if date <= currentMax:
                     actualPayments += int(payment["amount"])
                     lastPaymentDate = parser.isoparse(payment["date"])
                 # Get the date when the balance was paid. The delta between the due date and the time the balance was
@@ -126,7 +132,7 @@ def getScore(scoreInput: ScoreInput) -> Score:
                 expectedPaymentAmount,
                 actualPayments,
                 totalExpectedPayments,
-                start,
+                current,
                 lastPaymentDate,
                 balancePaymentDateAfterDueDate,
             )
