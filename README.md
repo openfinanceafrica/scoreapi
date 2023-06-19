@@ -117,6 +117,24 @@ scoreapi$ black .
 
 <br/>
 
+## Use as a pip package
+
+### Linux/MacOS
+
+```bash
+$ python -m pip install scoreapi
+[...]
+Successfully installed scoreapi
+```
+### Windows
+```bash
+C:>  py -m pip install scoreapi
+[...]
+Successfully installed scoreapi
+```
+
+<br/>
+
 ## Contributing
 
 We welcome contributions both big and small ❤️ 
