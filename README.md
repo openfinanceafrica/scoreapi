@@ -123,14 +123,10 @@ scoreapi$ black .
 
 ```bash
 $ python -m pip install scoreapi
-[...]
-Successfully installed scoreapi
 ```
 ### Windows
 ```bash
 C:>  py -m pip install scoreapi
-[...]
-Successfully installed scoreapi
 ```
 
 <br/>
