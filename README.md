@@ -119,16 +119,31 @@ scoreapi$ black .
 
 ## Use as a pip package
 
-### Linux/MacOS
+### Unix/macOS
 
 ```bash
-$ python -m pip install scoreapi
+$ python3 -m pip install scoreapi
 ```
 ### Windows
 ```bash
 C:>  py -m pip install scoreapi
 ```
 
+You can test that it was installed correctly by importing the package. Make sure you’re still in your virtual environment, then run Python:
+
+### Unix/macOS
+```bash
+python3
+```
+### Windows
+```bash
+py
+```
+and import the package:
+```bash
+>>> import scoreapi
+>>> def getScore(scoreInput: ScoreInput) -> Score:
+```
 <br/>
 
 ## Contributing
