@@ -1,3 +1,6 @@
+### 🚨 UPDATE: This respository is no longer actively maintained. The code can still be modified and used as a library since the API is not currently available.
+
+
 # Payment Score API
 
 This project contains source code and supporting files for the [Open Finance Africa](https://openfinance.africa) Payment Score API. 
