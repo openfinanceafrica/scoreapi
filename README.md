@@ -1,4 +1,4 @@
-### 🚨 UPDATE: This respository is no longer actively maintained. The code can still be modified and used as a library since the API is not currently available.
+### 🚨 UPDATE: This respository is no longer actively maintained. The code can still be modified and used as a library since the API (and website) is not currently available.
 
 
 # Payment Score API
